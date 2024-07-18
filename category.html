@@ -1,0 +1,50 @@
+<html>
+
+<head>
+  <style type="text/css">
+    .widget-wrapper {
+      padding: 2em;
+      background-color: #fff;
+      border-radius: 8px;
+      border: 3px solid #6758FF;
+    }
+  </style>
+</head>
+
+<body style="overflow: hidden;">
+  <div class="widget-wrapper">
+    <h3>카테고리를 선택하여 게임 시작!</h3>
+    <h4>반복 횟수 </h4><input id="widget-round" type="number" placeholder="(0이나 공백은 무한반복)" />
+    <div>
+      <h4>제한 시간 <span id="time">60초</span></h4>
+      <input type="range" min="10" max="120" value="60" class="slider" step="5" id="widget-time">
+    </div>
+    <div id="widget-category"></div>
+  </div>
+  <script type="text/javascript">
+    const STATE_INIT = 3000;
+    const STATE_READY = 3001;
+    const STATE_PLAYING = 3002;
+    const STATE_JUDGE = 3004;
+    const STATE_END = 3005;
+    const STATE_CHOOSE_CATEGORY = 3006;
+    const time = document.getElementById('time');
+    const wTime = document.getElementById('widget-time');
+
+    wTime.addEventListener('input', e => time.innerText = `${e.target.value}초`);
+    window.addEventListener('message', e => {
+      const { state, categories } = e.data;
+      if (state === STATE_CHOOSE_CATEGORY) {
+        for (let i = 0, il = categories.length; i < il; i++) {
+          const btn = document.createElement('button');
+          btn.innerText = categories[i];
+          btn.classList.add('category');
+          btn.addEventListener('click', e => window.parent.postMessage({ category: categories[i], round: document.getElementById('widget-round').value, time: wTime.value }, "*"));
+          document.getElementById('widget-category').appendChild(btn);
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
